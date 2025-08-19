@@ -1,7 +1,8 @@
 {
     "title":"Blog Title",
     "subTitle":"Blog description",
-    "avatarUrl":"https://github.githubassets.com/favicons/favicon.svg",
+    "avatarUrl":"https://avatars.githubusercontent.com/u/49212444?v=4",
     "GMEEK_VERSION":"last",
-    "i18n":"EN"
+    "i18n":"EN",
+    "UTC":3,
 }
