@@ -297,35 +297,7 @@ For the next step to work, don't forget to set the right permission. which is (6
 ```bash
 kali :: exercises/HMV/lazzycorp » ssh arvind@10.9.9.12 -i id_rsa                                             130 ↵
 Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.4.0-216-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/pro
-
- System information as of Thu 21 Aug 2025 04:33:01 AM UTC
-
-  System load:  0.0               Processes:               137
-  Usage of /:   56.9% of 8.02GB   Users logged in:         0
-  Memory usage: 25%               IPv4 address for enp0s3: 10.9.9.12
-  Swap usage:   0%
-
- * Ubuntu 20.04 LTS Focal Fossa has reached its end of standard support on 31 Ma
-
-   For more details see:
-   https://ubuntu.com/20-04
-
-Expanded Security Maintenance for Infrastructure is not enabled.
-
-0 updates can be applied immediately.
-
-31 additional security updates can be applied with ESM Infra.
-Learn more about enabling ESM Infra service for Ubuntu 20.04 at
-https://ubuntu.com/20-04
-
-
-The list of available updates is more than a week old.
-To check for new updates run: sudo apt update
-
+<SNIP>
 Welcome to LazyCorp. No flags here, go back.
 Last login: Wed Jul 16 12:24:12 2025
 arvind@arvindlazycorp:~$ whoami
