@@ -1,4 +1,4 @@
-## Hackmyvm Lazzycorp
+## HackMyVM - Lazzycorp
 Finding the IP address of the target host. I used `10.9.9.0/24` because this is the subnet for all the security VMs
 ```bash
 kali :: exercises/HMV/lazzycorp » fping -agq 10.9.9.0/24
