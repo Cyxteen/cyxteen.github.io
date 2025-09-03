@@ -2,8 +2,8 @@
     "title":"Cyxt33n Blog",
     "subTitle":"Master the core, then explore.",
     "avatarUrl":"https://avatars.githubusercontent.com/u/49212444?v=4",
+    "faviconUrl":"https://avatars.githubusercontent.com/u/49212444?v=4",
     "GMEEK_VERSION":"last",
     "i18n":"EN",
-    "UTC":3,
-    "allHead":"<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script>"
+    "UTC":3
 }
